@@ -150,6 +150,7 @@ def lab_invk(xWgrip, yWgrip, zWgrip, yaw_WgripDegree):
 
 	# c_line = np.sqrt((x_3end - (-0.150))**2 + (z_3end - (0.010 + links[1]))**2)
 	c_line = np.sqrt((x_3end - 0)**2 + (y_3end - 0)**2 + (z_3end - links[1])**2) # not ours PLEASE REMOVE
+	c_line = np.sqrt(x_3end**2 + y_3end**2 + (z_3end - links[1])**2)
 	print(f'Cl_line: {c_line}')
 
 	theta3 = (np.pi) - (np.arccos((links[5]**2 + links[3]**2 - c_line**2)/(2*links[3]*links[5])))
@@ -159,17 +160,17 @@ def lab_invk(xWgrip, yWgrip, zWgrip, yaw_WgripDegree):
 
 	theta2big = -1 * np.arccos((links[3]**2 + c_line**2 - links[5]**2) / (2*links[3]*c_line))
 	
-	theta2 = theta2small + theta2big
+	#theta2 = theta2small + theta2big
+	theta2 = -theta2small - theta2big
 	theta4 = -theta2 - theta3
-
-
-
-
-	# theta1 = 0.0
-	# theta2 = 0.0
-	# theta3 = 0.0
-	# theta4 = 0.0
 	theta5 = -np.pi/2
-	# theta6 = 0.0
+
+	print(f'Theta 1: {np.degrees(theta1)}')
+	print(f'Theta 2: {np.degrees(theta2)}')
+	print(f'Theta 3: {np.degrees(theta3)}')
+	print(f'Theta 4: {np.degrees(theta4)}')
+	print(f'Theta 5: {np.degrees(theta5)}')
+	print(f'Theta 6: {np.degrees(theta6)}')
+
 	# ==============================================================#
 	return lab_fk(theta1, theta2, theta3, theta4, theta5, theta6)
