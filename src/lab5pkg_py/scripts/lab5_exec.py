@@ -15,13 +15,17 @@ from blob_search import *
 
 # Position for UR3 not blocking the camera
 go_away = [270*PI/180.0, -90*PI/180.0, 90*PI/180.0, -90*PI/180.0, -90*PI/180.0, 135*PI/180.0]
-
+green_home = np.array([0.1, 0, 0.03])
+orange_home = np.array([0.2, 0, 0.03])
 # Store world coordinates of green and yellow blocks
 xw_yw_G = []
-xw_yw_Y = []
+xw_yw_O = []
+# xw_yw_Y = []
+
 
 # Any other global variable you want to define
 # Hints: where to put the blocks?
+
 
 
 # ========================= Student's code ends here ===========================
@@ -222,7 +226,7 @@ class ImageConverter:
     def image_callback(self, data):
 
         global xw_yw_G # store found green blocks in this list
-        global xw_yw_Y # store found yellow blocks in this list
+        global xw_yw_O # store found yellow blocks in this list
 
         try:
           # Convert ROS image to OpenCV image
@@ -244,7 +248,7 @@ class ImageConverter:
         # the image frame to the global world frame.
 
         xw_yw_G = blob_search(cv_image, "green")
-        xw_yw_Y = blob_search(cv_image, "yellow")
+        # xw_yw_O = blob_search(cv_image, "orange")
 
 
 """
@@ -253,7 +257,7 @@ Program run from here
 def main():
 
     global go_away
-    global xw_yw_R
+    global xw_yw_o
     global xw_yw_G
 
     # global variable1
@@ -283,15 +287,14 @@ def main():
 
     ic = ImageConverter(SPIN_RATE)
     time.sleep(5)
-
+    print("here")
     # ========================= Student's code starts here =========================
 
     """
     Hints: use the found xw_yw_G, xw_yw_Y to move the blocks correspondingly. You will
     need to call move_block(pub_command, loop_rate, start_xw_yw_zw, target_xw_yw_zw, vel, accel)
     """
-
-
+    print(xw_yw_G)
 
     # ========================= Student's code ends here ===========================
 

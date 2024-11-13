@@ -7,13 +7,16 @@ import numpy as np
 
 # Params for camera calibration
 theta = 0.0
-beta = 0.0
-tx = 0.0
-ty = 0.0
+beta = 75 / 0.1
+tx = 329
+ty = 237
 
 # Function that converts image coord to world coord
 def IMG2W(col, row):
-    pass
+    x = (col - tx) / beta
+    y = (row - ty) / beta
+    return x, y
+
 
 # ========================= Student's code ends here ===========================
 
@@ -29,6 +32,7 @@ def blob_search(image_raw, color):
 
     # Filter by Area.
     params.filterByArea = True
+    params.minArea = 50
 
     # Filter by Circularity
     params.filterByCircularity = False
@@ -49,37 +53,44 @@ def blob_search(image_raw, color):
 
     # ========================= Student's code starts here =========================
 
-    blue_lower = (110,50,50)     # blue lower
+    blue_lower = (102,50,50)     # blue lower
     blue_upper = (130,255,255)   # blue upper
 
-    orange_lower = (10, 130, 130)
-    orange_upper = (15, 255, 255)
+    orange_lower = (4, 130, 130)
+    orange_upper = (20, 255, 255)
     
     green_lower = (40, 50, 30)
     green_upper = (60, 255, 255)
 
     # Define a mask using the lower and upper bounds of the target color
-    masks = [
-        cv2.inRange(hsv_image, blue_lower, blue_upper),
-        cv2.inRange(hsv_image, orange_lower, orange_upper),
-        cv2.inRange(hsv_image, green_lower, green_upper),
-    ]
-    combined_mask = masks[0] | masks[1] | masks[2]
-    # blue_mask_image = cv2.inRange(hsv_image, blue_lower, blue_upper)
-    # orange_mask_image = cv2.inRange(hsv_image, orange_lower, orange_upper)
-    # green_mask_image = cv2.inRange(hsv_image, green_lower, green_upper)
+    # masks = [
+    #     cv2.inRange(hsv_image, blue_lower, blue_upper),
+    #     cv2.inRange(hsv_image, orange_lower, orange_upper),
+    #     cv2.inRange(hsv_image, green_lower, green_upper),
+    # ]
+    # combined_mask = masks[0] | masks[1] | masks[2]
+
+
+    real_mask = None
+    if color == 'green':
+        real_mask = cv2.inRange(hsv_image, green_lower, green_upper)
+    elif color == 'blue':
+        real_mask = cv2.inRange(hsv_image, blue_lower, blue_upper)
+    elif color == 'orange':
+        real_mask = cv2.inRange(hsv_image, orange_lower, orange_upper)
+    else:
+        return []
 
     # ========================= Student's code ends here ===========================
 
-    # keypoints = detector.detect(green_mask_image)
-    keypoints_s = [detector.detect(mask) for mask in masks]
-    keypoints_s = [detector.detect(combined_mask)]
+    keypoints = detector.detect(real_mask)
+
+
     # Find blob centers in the image coordinates
     blob_image_center = []
-    for keypoints in keypoints_s:
-        num_blobs = len(keypoints)
-        for i in range(num_blobs):
-            blob_image_center.append((keypoints[i].pt[0],keypoints[i].pt[1]))
+    num_blobs = len(keypoints)
+    for i in range(num_blobs):
+        blob_image_center.append((keypoints[i].pt[0],keypoints[i].pt[1]))
 
     # ========================= Student's code starts here =========================
 
@@ -101,7 +112,7 @@ def blob_search(image_raw, color):
     cv2.namedWindow("Camera View")
     cv2.imshow("Camera View", image_raw)
     cv2.namedWindow("Mask View")
-    cv2.imshow("Mask View", combined_mask)
+    cv2.imshow("Mask View", real_mask)
     cv2.namedWindow("Keypoint View")
     cv2.imshow("Keypoint View", im_with_keypoints)
 
