@@ -21,8 +21,10 @@ orange_home = np.array([0.2, 0, 0.03])
 xw_yw_G = []
 xw_yw_O = []
 # xw_yw_Y = []
-
-
+goal_G = [0.15, 0.0]
+count_G = 0
+goal_O = [0.15, 0.15]
+count_O = 0
 # Any other global variable you want to define
 # Hints: where to put the blocks?
 
@@ -203,10 +205,47 @@ def move_block(pub_cmd, loop_rate, start_xw_yw_zw, target_xw_yw_zw, vel, accel):
     # global variable2
 
     error = 0
+    current_angles = lab_invk(start_xw_yw_zw[0],
+                              start_xw_yw_zw[1],
+                              start_xw_yw_zw[2] + 0.15,
+                              90)
+                            
+    move_arm(pub_cmd, loop_rate, current_angles, vel, accel)
+    
+    current_angles = lab_invk(start_xw_yw_zw[0],
+                              start_xw_yw_zw[1],
+                              start_xw_yw_zw[2],
+                              90)
+    
+    move_arm(pub_cmd, loop_rate, current_angles, vel, accel)
+
+    gripper(pub_cmd, loop_rate, True)
+    time.sleep(0.5) # wait for suction
+
+    if digital_in_0 == 0:
+        print("Gripper error")
+        gripper(pub_cmd, loop_rate, False)
+        move_arm(pub_cmd, loop_rate, go_away, 4, 4)
+        return error
+
+    current_angles = lab_invk(target_xw_yw_zw[0],
+                              target_xw_yw_zw[1],
+                              target_xw_yw_zw[2] + 0.15,
+                              90)
+    move_arm(pub_cmd, loop_rate, current_angles, vel, accel)
+
+    current_angles = lab_invk(target_xw_yw_zw[0],
+                              target_xw_yw_zw[1],
+                              target_xw_yw_zw[2],
+                              90)
+    
+    gripper(pub_cmd, loop_rate, False)
+
+
 
     # ========================= Student's code ends here ===========================
 
-    return error
+    return 1
 
 
 class ImageConverter:
@@ -294,7 +333,34 @@ def main():
     Hints: use the found xw_yw_G, xw_yw_Y to move the blocks correspondingly. You will
     need to call move_block(pub_command, loop_rate, start_xw_yw_zw, target_xw_yw_zw, vel, accel)
     """
-    print(xw_yw_G)
+    # After the delay, the block image buffers will be full
+    count_G = 0
+    count_O = 0
+    print("Green Blocks movin rn")
+    for i, block in enumerate(xw_yw_G):
+        print(i)
+        move_block(
+            pub_command,
+            loop_rate,
+            list(block) + [0.03],
+            green_home.tolist() + [(count_G + 1)*0.03],
+            vel,
+            accel
+        )
+        count_G += 1
+
+    print("Orange Blocks movin rn")
+    for i, block in enumerate(xw_yw_O):
+        move_block(
+            pub_command,
+            loop_rate,
+            list(block) + [0.03],
+            green_home.tolist() + [(count_O + 1)*0.03],
+            vel,
+            accel
+        )
+        count_O += 1
+
 
     # ========================= Student's code ends here ===========================
 
