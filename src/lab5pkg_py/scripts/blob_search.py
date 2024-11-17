@@ -5,17 +5,22 @@ import numpy as np
 
 # ========================= Student's code starts here =========================
 
-# Params for camera calibration
-theta = 0.0
+# Params for camera calibration, TODO: need to change these =
+theta = np.arctan2(.1, 75)
 beta = 75 / 0.1
-tx = 329
-ty = 237
+tx = 52
+ty = 224
 
 # Function that converts image coord to world coord
 def IMG2W(col, row):
-    x = (col - tx) / beta
-    y = (row - ty) / beta
-    return x, y
+    # scale down to world coords
+    x = (row - tx) / beta
+    y = (col - ty) / beta
+
+    rotated_to_world = (np.array([[np.cos(theta), -np.sin(theta)],
+                                  [np.sin(theta), np.cos(theta)]]) @ np.array([x, y]).T).tolist()
+
+    return rotated_to_world
 
 
 # ========================= Student's code ends here ===========================
@@ -32,7 +37,7 @@ def blob_search(image_raw, color):
 
     # Filter by Area.
     params.filterByArea = True
-    params.minArea = 50
+    params.minArea = 400
 
     # Filter by Circularity
     params.filterByCircularity = False
@@ -53,14 +58,14 @@ def blob_search(image_raw, color):
 
     # ========================= Student's code starts here =========================
 
-    blue_lower = (102,50,50)     # blue lower
-    blue_upper = (130,255,255)   # blue upper
+    blue_lower = (105,60,50)     # blue lower
+    blue_upper = (125,255,255)   # blue upper
 
-    orange_lower = (4, 130, 130)
-    orange_upper = (20, 255, 255)
+    orange_lower = (0, 205, 80)   # orange lower
+    orange_upper = (17, 255, 210)   # orange upper
     
-    green_lower = (40, 50, 30)
-    green_upper = (60, 255, 255)
+    green_lower = (40,150,50)
+    green_upper = (70,255,255) 
 
     # Define a mask using the lower and upper bounds of the target color
     # masks = [
@@ -102,7 +107,8 @@ def blob_search(image_raw, color):
     xw_yw = []
 
     if(num_blobs == 0):
-        print("No block found!")
+        # print("No block found!")
+        pass
     else:
         # Convert image coordinates to global world coordinate using IM2W() function
         for i in range(num_blobs):

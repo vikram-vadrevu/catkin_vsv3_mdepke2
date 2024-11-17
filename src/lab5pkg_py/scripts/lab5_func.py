@@ -99,7 +99,7 @@ def lab_invk(xWgrip, yWgrip, zWgrip, yaw_WgripDegree):
 	yWgrip = yWgrip - .150
 	zWgrip = zWgrip - .010
 	links = np.array([-1000, 152, 120, 244, 93, 213, 83, 83, 82, 53.5, 59])/1000
-	print(f'Links: {links}')
+	# print(f'Links: {links}')
 	x_center = xWgrip - links[9]*np.cos(np.radians(yaw_WgripDegree))
 	y_center = yWgrip - links[9]*np.sin(np.radians(yaw_WgripDegree))
 	z_center = zWgrip
@@ -133,12 +133,12 @@ def lab_invk(xWgrip, yWgrip, zWgrip, yaw_WgripDegree):
 	theta4 = -theta2 - theta3
 	theta5 = -np.pi/2
 
-	print(f'Theta 1: {np.degrees(theta1)}')
-	print(f'Theta 2: {np.degrees(theta2)}')
-	print(f'Theta 3: {np.degrees(theta3)}')
-	print(f'Theta 4: {np.degrees(theta4)}')
-	print(f'Theta 5: {np.degrees(theta5)}')
-	print(f'Theta 6: {np.degrees(theta6)}')
+	# print(f'Theta 1: {np.degrees(theta1)}')
+	# print(f'Theta 2: {np.degrees(theta2)}')
+	# print(f'Theta 3: {np.degrees(theta3)}')
+	# print(f'Theta 4: {np.degrees(theta4)}')
+	# print(f'Theta 5: {np.degrees(theta5)}')
+	# print(f'Theta 6: {np.degrees(theta6)}')
 
 	# ==============================================================#
 	return lab_fk(theta1, theta2, theta3, theta4, theta5, theta6)

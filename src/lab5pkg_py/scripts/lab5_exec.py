@@ -15,16 +15,17 @@ from blob_search import *
 
 # Position for UR3 not blocking the camera
 go_away = [270*PI/180.0, -90*PI/180.0, 90*PI/180.0, -90*PI/180.0, -90*PI/180.0, 135*PI/180.0]
-green_home = np.array([0.1, 0, 0.03])
-orange_home = np.array([0.2, 0, 0.03])
+# green_home = np.array([0.1, 0, 0.03])
+# orange_home = np.array([0.2, 0, 0.03])
 # Store world coordinates of green and yellow blocks
 xw_yw_G = []
 xw_yw_O = []
-# xw_yw_Y = []
-goal_G = [0.15, 0.0]
-count_G = 0
-goal_O = [0.15, 0.15]
-count_O = 0
+xw_yw_B = []
+
+green_home = [0.15, 0.0]
+orange_home = [0.15, 0.15]
+blue_home = [0.15, 0.30]
+
 # Any other global variable you want to define
 # Hints: where to put the blocks?
 
@@ -205,6 +206,7 @@ def move_block(pub_cmd, loop_rate, start_xw_yw_zw, target_xw_yw_zw, vel, accel):
     # global variable2
 
     error = 0
+    # Move to above the original block
     current_angles = lab_invk(start_xw_yw_zw[0],
                               start_xw_yw_zw[1],
                               start_xw_yw_zw[2] + 0.15,
@@ -212,6 +214,7 @@ def move_block(pub_cmd, loop_rate, start_xw_yw_zw, target_xw_yw_zw, vel, accel):
                             
     move_arm(pub_cmd, loop_rate, current_angles, vel, accel)
     
+    # Move to the block
     current_angles = lab_invk(start_xw_yw_zw[0],
                               start_xw_yw_zw[1],
                               start_xw_yw_zw[2],
@@ -219,19 +222,31 @@ def move_block(pub_cmd, loop_rate, start_xw_yw_zw, target_xw_yw_zw, vel, accel):
     
     move_arm(pub_cmd, loop_rate, current_angles, vel, accel)
 
+    # Attempt to pick up the block
     gripper(pub_cmd, loop_rate, True)
-    time.sleep(0.5) # wait for suction
+    time.sleep(1.0) # wait for suction
 
     if digital_in_0 == 0:
         print("Gripper error")
         gripper(pub_cmd, loop_rate, False)
         move_arm(pub_cmd, loop_rate, go_away, 4, 4)
         return error
+    
+    # Move back to above the original block, clean other block nearby
+    current_angles = lab_invk(start_xw_yw_zw[0],
+                              start_xw_yw_zw[1],
+                              start_xw_yw_zw[2] + 0.15,
+                              90)
+                            
+    move_arm(pub_cmd, loop_rate, current_angles, vel, accel)
 
+    # Move block to above target location
     current_angles = lab_invk(target_xw_yw_zw[0],
                               target_xw_yw_zw[1],
                               target_xw_yw_zw[2] + 0.15,
                               90)
+    
+    # Move block to target location
     move_arm(pub_cmd, loop_rate, current_angles, vel, accel)
 
     current_angles = lab_invk(target_xw_yw_zw[0],
@@ -239,6 +254,10 @@ def move_block(pub_cmd, loop_rate, start_xw_yw_zw, target_xw_yw_zw, vel, accel):
                               target_xw_yw_zw[2],
                               90)
     
+    # Move block to target location
+    move_arm(pub_cmd, loop_rate, current_angles, vel, accel)
+
+    # Turn off gripper
     gripper(pub_cmd, loop_rate, False)
 
 
@@ -266,6 +285,7 @@ class ImageConverter:
 
         global xw_yw_G # store found green blocks in this list
         global xw_yw_O # store found yellow blocks in this list
+        global xw_yw_B
 
         try:
           # Convert ROS image to OpenCV image
@@ -287,7 +307,8 @@ class ImageConverter:
         # the image frame to the global world frame.
 
         xw_yw_G = blob_search(cv_image, "green")
-        # xw_yw_O = blob_search(cv_image, "orange")
+        xw_yw_O = blob_search(cv_image, "orange")
+        xw_yw_B = blob_search(cv_image, "blue")
 
 
 """
@@ -296,8 +317,9 @@ Program run from here
 def main():
 
     global go_away
-    global xw_yw_o
+    global xw_yw_O
     global xw_yw_G
+    global xw_yw_B
 
     # global variable1
     # global variable2
@@ -334,33 +356,39 @@ def main():
     need to call move_block(pub_command, loop_rate, start_xw_yw_zw, target_xw_yw_zw, vel, accel)
     """
     # After the delay, the block image buffers will be full
-    count_G = 0
-    count_O = 0
     print("Green Blocks movin rn")
     for i, block in enumerate(xw_yw_G):
         print(i)
-        move_block(
-            pub_command,
-            loop_rate,
-            list(block) + [0.03],
-            green_home.tolist() + [(count_G + 1)*0.03],
-            vel,
-            accel
-        )
-        count_G += 1
+        if move_block(pub_command,
+                      loop_rate,
+                      list(block) + [0.027],
+                      green_home + [(i + 1)*0.031],
+                      vel,
+                      accel) == 0:
+            exit(1)
 
     print("Orange Blocks movin rn")
     for i, block in enumerate(xw_yw_O):
-        move_block(
-            pub_command,
-            loop_rate,
-            list(block) + [0.03],
-            green_home.tolist() + [(count_O + 1)*0.03],
-            vel,
-            accel
-        )
-        count_O += 1
+        print(i)
+        if move_block(pub_command,
+                      loop_rate,
+                      list(block) + [0.027],
+                      orange_home + [(i + 1)*0.031],
+                      vel,
+                      accel) == 0:
+            exit(1)
 
+
+    print("Blue Blocks movin rn")
+    for i, block in enumerate(xw_yw_B):
+        print(i)
+        if move_block(pub_command,
+                      loop_rate,
+                      list(block) + [0.027],
+                      blue_home + [(i + 1)*0.031],
+                      vel,
+                      accel) == 0:
+            exit(1)
 
     # ========================= Student's code ends here ===========================
 
