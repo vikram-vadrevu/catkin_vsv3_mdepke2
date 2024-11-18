@@ -81,7 +81,8 @@ def blob_search(image_raw, color):
     elif color == 'blue':
         real_mask = cv2.inRange(hsv_image, blue_lower, blue_upper)
     elif color == 'orange':
-        real_mask = cv2.inRange(hsv_image, orange_lower, orange_upper)
+        # real_mask = cv2.inRange(hsv_image, orange_lower, orange_upper)
+        pass
     else:
         return []
 
