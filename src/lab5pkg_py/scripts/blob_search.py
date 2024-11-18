@@ -5,11 +5,10 @@ import numpy as np
 
 # ========================= Student's code starts here =========================
 
-# Params for camera calibration, TODO: need to change these =
 theta = np.arctan2(.1, 75)
 beta = 75 / 0.1
-tx = 52
-ty = 224
+tx = 50
+ty = 222
 
 # Function that converts image coord to world coord
 def IMG2W(col, row):
@@ -61,8 +60,8 @@ def blob_search(image_raw, color):
     blue_lower = (105,60,50)     # blue lower
     blue_upper = (125,255,255)   # blue upper
 
-    orange_lower = (0, 205, 80)   # orange lower
-    orange_upper = (17, 255, 210)   # orange upper
+    # orange_lower = (0, 205, 80)   # orange lower
+    # orange_upper = (17, 255, 210)   # orange upper
     
     green_lower = (40,150,50)
     green_upper = (70,255,255) 

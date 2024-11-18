@@ -307,7 +307,7 @@ class ImageConverter:
         # the image frame to the global world frame.
 
         xw_yw_G = blob_search(cv_image, "green")
-        xw_yw_O = blob_search(cv_image, "orange")
+        # xw_yw_O = blob_search(cv_image, "orange")
         xw_yw_B = blob_search(cv_image, "blue")
 
 
